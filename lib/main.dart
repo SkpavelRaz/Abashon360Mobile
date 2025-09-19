@@ -17,6 +17,7 @@ class Abashon extends StatelessWidget{
         useMaterial3: false
       ),
       home: SplashScreen(),
+
     );
   }
 
