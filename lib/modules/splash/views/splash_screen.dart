@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:abashon_360_mobile/domain/constants/app_colors.dart';
 import 'package:abashon_360_mobile/domain/constants/uihelper.dart';
 import 'package:abashon_360_mobile/modules/login/views/Login_screen.dart';
+import 'package:abashon_360_mobile/utils/styles/k_assets.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget{
@@ -29,7 +30,7 @@ class _SplashScreenState extends State<SplashScreen>  {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            UiHelper.CustomImage(img: "ic_abashon_logo.png")
+            Image.asset(KAssetName.main_logo.imagePath)
           ],
         ),
       ),

@@ -46,13 +46,12 @@ class _OtpScreenState extends State<OtpScreen> {
     return Scaffold(
       body: Container(
         width: double.infinity,
+        height: double.infinity, // full screen
         decoration: const BoxDecoration(
-          // gradient: LinearGradient(
-          //   begin: Alignment.topCenter,
-          //   end: Alignment.center,
-          //   colors: [Color(0xFF4CAF50), Color(0xFF4CAF50)],
-          // ),
-          color: Color(0xFF4CAF50),
+          image: DecorationImage(
+            image: AssetImage("assets/images/auth_bg.png"), // your PNG
+            fit: BoxFit.cover, // cover entire screen
+          ),
         ),
         child: Column(
           children: [
