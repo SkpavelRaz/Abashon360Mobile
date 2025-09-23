@@ -1,4 +1,5 @@
 
+import 'package:abashon_360_mobile/modules/home/views/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 
@@ -20,6 +21,7 @@ class _PinViewSetupScreen extends State<PinViewSetupScreen>{
         const SnackBar(content: Text("Please set your pin properly")),
       );
     } else {
+      Navigator.push(context,MaterialPageRoute(builder: (context)=>HomeScreen()));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("submitted: $phone"))
       );
