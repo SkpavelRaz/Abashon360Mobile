@@ -33,12 +33,18 @@ class _HomeScreen extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.arrow_back_rounded),
+                  Container(
+                    alignment: Alignment.centerRight,
+                    margin: EdgeInsetsGeometry.all(8),
+                    child:Icon(Icons.cancel_outlined,size: 28,),
+                  ),
+
                   Image.asset(KAssetName.main_logo.imagePath,width: 120,height: 80,),
                   const SizedBox(width: 4),
-                  const Text(
+                  Text(
                     "Abashon 360",
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w400,wordSpacing: 50),
+                    overflow: TextOverflow.clip,
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w400),
                   ),
                 ],
               ),
