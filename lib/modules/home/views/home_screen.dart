@@ -15,14 +15,11 @@ class _HomeScreen extends State<HomeScreen> {
 
 
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         backgroundColor: Colors.green,
-        title: Text("Home"),
         shadowColor: Colors.lightGreen,
-
       ),
 
-      endDrawer: Drawer(
+      drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -37,14 +34,11 @@ class _HomeScreen extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(Icons.arrow_back_rounded),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(KAssetName.main_logo.imagePath,width: 150,height: 80,)
-                  ),
-                  const SizedBox(width: 8),
+                  Image.asset(KAssetName.main_logo.imagePath,width: 120,height: 80,),
+                  const SizedBox(width: 4),
                   const Text(
-                    "Abashon360",
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w400),
+                    "Abashon 360",
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w400,wordSpacing: 50),
                   ),
                 ],
               ),
@@ -60,6 +54,10 @@ class _HomeScreen extends State<HomeScreen> {
             ),
           ],
         ),
+      ),
+
+      body: Stack(
+
       ),
     );
   }

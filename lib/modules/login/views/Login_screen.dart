@@ -30,69 +30,70 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity, // full screen
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/auth_bg.png"), // your PNG
-            fit: BoxFit.cover, // cover entire screen
-          ),
-        ),
-        child: Column(
-          children: [
-            const SizedBox(height: 40),
-            // Top text
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal:16.0,vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text("স্বাগতম,", style: TextStyle(color: Colors.white,fontSize: 22)),
-                ],
+      resizeToAvoidBottomInset: false,
+      body: Stack(
+        children: [
+          // Background image
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/images/auth_bg.png"),
+                fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(height: 80),
-            const Text(
-              "ABASHON 360°",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5),
-            ),
-            const SizedBox(height: 60),
+          ),
 
-            // White card
-            SizedBox(
-              child: Container(
-                margin: const EdgeInsets.all(20),
-                height: 400,
-                // padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 40),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
-                      spreadRadius: 2,
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
+          // Foreground content
+          SingleChildScrollView( // allows only content to scroll if needed
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal:16.0, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      Text("স্বাগতম,", style: TextStyle(color: Colors.white, fontSize: 22)),
+                    ],
+                  ),
                 ),
-                child: Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 24),
+                const SizedBox(height: 80),
+                const Text(
+                  "ABASHON 360°",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5),
+                ),
+                const SizedBox(height: 60),
+
+                // White card
+                Container(
+                  margin: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        spreadRadius: 2,
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 24),
                       const Text(
                         "এখানে লগইন\nকরুন",
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                       ),
-                      const SizedBox(height:4),
+                      const SizedBox(height: 4),
                       Container(
                         height: 2,
                         width: 116,
@@ -102,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 60),
+                      const SizedBox(height: 40),
 
                       // Phone input
                       TextField(
@@ -119,6 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
+
                       // Submit Button
                       Center(
                         child: SizedBox(
@@ -129,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(6),
                               ),
-                              padding: EdgeInsets.symmetric(vertical: 14),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             onPressed: _onSubmit,
                             child: const Text(
@@ -142,10 +144,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
