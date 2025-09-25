@@ -1,6 +1,9 @@
 import 'package:abashon_360_mobile/modules/splash/views/splash_screen.dart';
 import 'package:flutter/material.dart';
 
+import 'modules/dashboard/views/dashboard_screen.dart';
+import 'modules/home/views/home_screen.dart';
+
 void main() {
   runApp(const Abashon());
 }
@@ -17,7 +20,7 @@ class Abashon extends StatelessWidget{
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: false
       ),
-      home: SplashScreen(),
+      home: DashboardScreen(),
 
     );
   }
