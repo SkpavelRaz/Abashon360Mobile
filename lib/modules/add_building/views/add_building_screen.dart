@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'add_unit_details.dart';
+
 class AddBuildingScreen extends StatefulWidget {
   const AddBuildingScreen({super.key});
 
@@ -10,6 +12,7 @@ class AddBuildingScreen extends StatefulWidget {
 class _AddBuildingScreen extends State<AddBuildingScreen> {
   final TextEditingController floorController = TextEditingController();
   final TextEditingController unitController = TextEditingController();
+  final TextEditingController holdingNoController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController chargeController = TextEditingController();
 
@@ -23,6 +26,7 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
   void _onSubmit() {
     if (floorController.text.isEmpty ||
         unitController.text.isEmpty ||
+        holdingNoController.text.isEmpty||
         addressController.text.isEmpty) {
       ScaffoldMessenger.of(
         context,
@@ -34,6 +38,7 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
       buildingList.add({
         "floor": floorController.text,
         "unit": unitController.text,
+        "holding_no": holdingNoController.text,
         "address": addressController.text,
         "charge": chargeController.text,
         "lift": isCheckedLift,
@@ -44,16 +49,29 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
       // clear fields after submit
       floorController.clear();
       unitController.clear();
+      holdingNoController.clear();
       addressController.clear();
       chargeController.clear();
       isCheckedLift = false;
       isCheckedGarage = false;
       isCheckedGuard = false;
+
+      if (buildingList.isNotEmpty) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AddUnitDetails(
+              buildingData: buildingList.last, // send last submitted
+            ),
+          ),
+        );
+      }
     });
 
     // hide keyboard after submit
     FocusScope.of(context).unfocus();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -115,11 +133,22 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
               ),
               const SizedBox(height: 8),
               TextField(
+                controller: holdingNoController,
+                keyboardType: TextInputType.name,
+                decoration: InputDecoration(
+                  hintText:
+                  "বাসা নং",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+              ), const SizedBox(height: 8),
+              TextField(
                 controller: addressController,
                 keyboardType: TextInputType.name,
                 decoration: InputDecoration(
                   hintText:
-                  "ঠিকানা (বাসা নং,রোড নং,ব্লক নং,থানা,জেলা,বিভাগ*)",
+                  "ঠিকানা (রোড নং,ব্লক নং,থানা,জেলা,বিভাগ*)",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(6),
                   ),
@@ -192,7 +221,9 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),
-                    onPressed: _onSubmit,
+                    onPressed: () {
+                      _onSubmit();
+                    },
                     child: const Text(
                       "জমা দিন",
                       style: TextStyle(fontSize: 16, color: Colors.white),
@@ -203,41 +234,7 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
             ],
           ),
         ),
-        // Column(
-        // children: [
-        // 🔹 Form Section (scrollable if needed)
-        // Expanded(
-        //   flex: 0,
-        //
-        // ),
 
-        // // 🔹 List Section (scrollable separately)
-        // ...buildingList.isEmpty
-        //     ? [const Center(child: Text("কোনো এন্ট্রি নেই"))]
-        //     : buildingList.map((data) {
-        //   final features = <String>[];
-        //   if (data["lift"]) features.add("লিফ্ট আছে");
-        //   if (data["garage"]) features.add("গ্যারেজ আছে");
-        //   if (data["guard"]) features.add("দারোয়ান আছে");
-        //
-        //   return Card(
-        //     margin: const EdgeInsets.symmetric(vertical: 8),
-        //     child: ListTile(
-        //       title: Text("তলা: ${data["floor"]}, ইউনিট: ${data["unit"]}"),
-        //       subtitle: Column(
-        //         crossAxisAlignment: CrossAxisAlignment.start,
-        //         children: [
-        //           Text("ঠিকানা: ${data["address"]}"),
-        //           Text("সার্ভিস চার্জ: ${data["charge"].isEmpty ? "নেই" : data["charge"]}"),
-        //           if (features.isNotEmpty)
-        //             Text("সুবিধা: ${features.join(", ")}"),
-        //         ],
-        //       ),
-        //     ),
-        //   );
-        // }).toList(),
-        // ],
-        // ),
       ),
     );
   }
