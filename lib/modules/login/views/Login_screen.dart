@@ -1,6 +1,10 @@
+import 'dart:math';
 
 import 'package:abashon_360_mobile/modules/otp/views/otp_screen.dart';
+import 'package:abashon_360_mobile/modules/pin_setup/views/pin_screen.dart';
 import 'package:flutter/material.dart';
+
+import '../auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,20 +16,55 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController phoneController = TextEditingController();
 
-  void _onSubmit() {
+  void _onSubmit() async {
     final phone = phoneController.text.trim();
-    if (phone.isEmpty || phone.length<11) {
+    if (phone.isEmpty || phone.length < 11) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please enter your phone number")),
       );
-    } else {
-      Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen()));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Phone submitted: $phone")),
+      return;
+    }
 
+    try {
+      // Show loading
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (_) => const Center(child: CircularProgressIndicator()),
       );
+
+      final auth = AuthService();
+      final response = await auth.validatePhone(phone);
+
+      // Close loading BEFORE any navigation
+      Navigator.pop(context);
+
+      if (response.status) {
+        if (response.data.otp) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => OtpScreen()),
+          );
+        } else if (response.data.vPin) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PinViewSetupScreen()),
+          );
+        } else {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(response.message)));
+        }
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(response.message)));
+      }
+    } catch (e) {
+      Navigator.pop(context); // Close loading if error
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -46,16 +85,23 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
 
           // Foreground content
-          SingleChildScrollView( // allows only content to scroll if needed
+          SingleChildScrollView(
+            // allows only content to scroll if needed
             child: Column(
               children: [
                 const SizedBox(height: 40),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal:16.0, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
-                      Text("স্বাগতম,", style: TextStyle(color: Colors.white, fontSize: 22)),
+                      Text(
+                        "স্বাগতম,",
+                        style: TextStyle(color: Colors.white, fontSize: 22),
+                      ),
                     ],
                   ),
                 ),
@@ -63,17 +109,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Text(
                   "ABASHON 360°",
                   style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.5),
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
+                  ),
                 ),
                 const SizedBox(height: 60),
 
                 // White card
                 Container(
                   margin: const EdgeInsets.all(20),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 24,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
@@ -91,7 +141,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       const Text(
                         "এখানে লগইন\nকরুন",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Container(
@@ -113,7 +166,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         decoration: InputDecoration(
                           hintText: "আপনার ফোন নম্বর লিখুন",
                           contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6),
                           ),
@@ -136,7 +191,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: _onSubmit,
                             child: const Text(
                               "জমা দিন",
-                              style: TextStyle(fontSize: 16, color: Colors.white),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
