@@ -2,14 +2,12 @@
 class ValidatePhoneData {
   bool status;
   int code;
-  int mode;
   String message;
   Data data;
 
   ValidatePhoneData({
     required this.status,
     required this.code,
-    required this.mode,
     required this.message,
     required this.data,
   });
@@ -17,7 +15,6 @@ class ValidatePhoneData {
   factory ValidatePhoneData.fromJson(Map<String, dynamic> json) => ValidatePhoneData(
     status: json["status"],
     code: json["code"],
-    mode: json["mode"],
     message: json["message"],
     data: Data.fromJson(json["data"]),
   );
@@ -25,7 +22,6 @@ class ValidatePhoneData {
   Map<String, dynamic> toJson() => {
     "status": status,
     "code": code,
-    "mode": mode,
     "message": message,
     "data": data.toJson(),
   };

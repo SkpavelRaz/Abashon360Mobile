@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../otp/data/verify_otp_data.dart';
 import 'data/validate_phone.dart';
 
 class AuthService {
@@ -30,8 +31,23 @@ class AuthService {
     ));
   }
 
+  /*Phone Verify*/
   Future<ValidatePhoneData> validatePhone(String phone) async {
     final response = await _dio.get("/cli/validate-pin-otp/$phone");
     return ValidatePhoneData.fromJson(response.data);
+  }
+
+
+  /*Verify otp*/
+  Future<VerifyOtpData> verifyOtp({
+    required String phone,
+    required String otp,
+  }) async {
+    final response = await _dio.post("/cli/verify-otp",
+      data: {
+        "phone": phone,
+        "otp": otp,
+      },);
+    return VerifyOtpData.fromJson(response.data);
   }
 }

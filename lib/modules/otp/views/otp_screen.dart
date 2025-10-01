@@ -3,16 +3,19 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 
+import '../../login/auth_service.dart';
 import '../../pin_setup/views/pin_screen.dart';
 
 class OtpScreen extends StatefulWidget {
-  const OtpScreen({super.key});
+  final String phone;
+  const OtpScreen({super.key,required this.phone});
 
   @override
   State<StatefulWidget> createState() => _OtpScreenState();
 }
 
 class _OtpScreenState extends State<OtpScreen> {
+
   final TextEditingController _otpController = TextEditingController();
   int _start = 30;
   bool _canResend = false;
@@ -168,15 +171,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  onPressed: () {
-                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>PinViewSetupScreen()));
-                                    // Handle OTP verification
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text("Entered OTP: ${_otpController.text}"),
-                                      ),
-                                    );
-                                  },
+                                  onPressed: _onSubmit,
                                   child: const Text("যাচাই করুন"),
                                 ),
                               ),
@@ -235,5 +230,41 @@ class _OtpScreenState extends State<OtpScreen> {
 
       ),
     );
+  }
+
+  Future<void> _onSubmit() async {
+    final otp=_otpController.text.trim();
+    if(otp.isEmpty){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter your otp")),
+      );
+      return;
+    }
+
+    try {
+      // Show loading
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (_) => const Center(child: CircularProgressIndicator()),
+      );
+
+      final auth = AuthService();
+      final response = await auth.verifyOtp(phone: widget.phone, otp: otp);
+
+      // Close loading BEFORE any navigation
+      Navigator.pop(context);
+
+      if (response.status) {
+        Navigator.push(context,MaterialPageRoute(builder: (context)=>PinViewSetupScreen()));
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(response.message)));
+      }
+    } catch (e) {
+      Navigator.pop(context); // Close loading if error
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
   }
 }

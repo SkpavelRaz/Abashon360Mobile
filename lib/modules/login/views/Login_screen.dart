@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (response.data.otp) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => OtpScreen()),
+            MaterialPageRoute(builder: (context) => OtpScreen(phone: phone)),
           );
         } else if (response.data.vPin) {
           Navigator.push(
