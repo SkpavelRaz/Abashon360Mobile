@@ -1,10 +1,16 @@
 
+import 'dart:math';
+
 import 'package:abashon_360_mobile/modules/home/views/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 
+import '../../login/auth_service.dart';
+
 class PinViewSetupScreen extends StatefulWidget{
-  const PinViewSetupScreen({super.key});
+  final String phone;
+  final bool set_pin;
+  const PinViewSetupScreen({super.key,required this.phone,required this.set_pin});
 
   @override
   State<StatefulWidget> createState() => _PinViewSetupScreen();
@@ -14,17 +20,46 @@ class PinViewSetupScreen extends StatefulWidget{
 class _PinViewSetupScreen extends State<PinViewSetupScreen>{
   final TextEditingController _otpController = TextEditingController();
 
-  void _onSubmit() {
-    final phone = _otpController.text.trim();
-    if (phone.isEmpty || phone.length<5) {
+  void _onSubmit() async {
+    final pin = _otpController.text.trim();
+    if (pin.isEmpty || pin.length<5) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please set your pin properly")),
       );
-    } else {
-      Navigator.push(context,MaterialPageRoute(builder: (context)=>HomeScreen()));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("submitted: $phone"))
+      return;
+    }
+
+    try {
+      // Show loading
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (_) => const Center(child: CircularProgressIndicator()),
       );
+
+      final auth = AuthService();
+      dynamic response;
+
+      if(widget.set_pin){
+        response=await auth.setPin(phone: widget.phone,pin: pin);
+      }else{
+        response=await auth.validationPin(phone: widget.phone,pin: pin);
+      }
+
+
+      // Close loading BEFORE any navigation
+      Navigator.pop(context);
+
+      if (response.status) {
+        Navigator.push(context,MaterialPageRoute(builder: (context)=>HomeScreen()));
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(response.message)));
+      }
+    } catch (e) {
+      Navigator.pop(context); // Close loading if error
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 

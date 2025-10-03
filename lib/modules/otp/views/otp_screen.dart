@@ -256,7 +256,7 @@ class _OtpScreenState extends State<OtpScreen> {
       Navigator.pop(context);
 
       if (response.status) {
-        Navigator.push(context,MaterialPageRoute(builder: (context)=>PinViewSetupScreen()));
+        Navigator.push(context,MaterialPageRoute(builder: (context)=>PinViewSetupScreen(phone: widget.phone,set_pin: true,)));
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(response.message)));

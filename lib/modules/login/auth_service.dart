@@ -50,4 +50,31 @@ class AuthService {
       },);
     return VerifyOtpData.fromJson(response.data);
   }
+
+  /*Set Pin*/
+  Future<VerifyOtpData> setPin({
+    required String phone,
+    required String pin,
+  }) async {
+    final response = await _dio.post("/cli/set-pin",
+      data: {
+        "phone": phone,
+        "pin": pin,
+      },);
+    return VerifyOtpData.fromJson(response.data);
+  }
+
+  /*Validation Pin*/
+  Future<VerifyOtpData> validationPin({
+    required String phone,
+    required String pin,
+  }) async {
+    final response = await _dio.post("/cli/validate-pin",
+      data: {
+        "phone": phone,
+        "pin": pin,
+      },);
+    return VerifyOtpData.fromJson(response.data);
+  }
+
 }

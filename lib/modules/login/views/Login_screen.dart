@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
         } else if (response.data.vPin) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => PinViewSetupScreen()),
+            MaterialPageRoute(builder: (context) => PinViewSetupScreen(phone: phone,set_pin:false)),
           );
         } else {
           ScaffoldMessenger.of(context)
