@@ -14,17 +14,32 @@ class AddUnitDetails extends StatefulWidget {
 }
 class _AddUnitDetails extends State<AddUnitDetails> {
 
-  final TextEditingController floorController = TextEditingController();
-  final TextEditingController unitController = TextEditingController();
-  final TextEditingController holdingNoController = TextEditingController();
-  final TextEditingController addressController = TextEditingController();
+  final TextEditingController phoneNumberController = TextEditingController();
+  final TextEditingController renterNameController = TextEditingController();
+  final TextEditingController houseRentController = TextEditingController();
   final TextEditingController chargeController = TextEditingController();
+  final TextEditingController gasBillController = TextEditingController();
+  final TextEditingController waterBillController = TextEditingController();
+  final TextEditingController garageController = TextEditingController();
+  final TextEditingController currentBillController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final data=widget.buildingData;
+    if(!data["charge"].isEmpty){
+      chargeController.text=data["charge"];
+    }
+  }
 
   void _onSubmit() async {
-    if (floorController.text.isEmpty ||
-        unitController.text.isEmpty ||
-        holdingNoController.text.isEmpty ||
-        addressController.text.isEmpty) {
+
+    if (phoneNumberController.text.isEmpty ||
+        renterNameController.text.isEmpty ||
+        houseRentController.text.isEmpty ||
+        gasBillController.text.isEmpty ||
+        waterBillController.text.isEmpty ||
+        currentBillController.text.isEmpty){
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("সব তথ্য পূরণ করুন")));
@@ -33,22 +48,21 @@ class _AddUnitDetails extends State<AddUnitDetails> {
 
     // Add data locally
     final newData = {
-      "floor": floorController.text,
-      "unit": unitController.text,
-      "holding_no": holdingNoController.text,
-      "address": addressController.text,
+      "phone": phoneNumberController.text,
+      "name": renterNameController.text,
+      "rent": houseRentController.text,
       "charge": chargeController.text,
+      "gas_bill": chargeController.text,
+      "current_bill": chargeController.text,
+      "water_bill": chargeController.text,
+      "garage_charge": chargeController.text,
+
     };
 
     setState(() {
       // buildingList.add(newData);
 
-      // Reset form
-      floorController.clear();
-      unitController.clear();
-      holdingNoController.clear();
-      addressController.clear();
-      chargeController.clear();
+
     });
 
     // Save to SharedPreferences (MUST be outside setState)
@@ -73,7 +87,7 @@ class _AddUnitDetails extends State<AddUnitDetails> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("ইউনিত যুক্ত করুন"),
+        title: const Text("ইউনিট যুক্ত করুন"),
         backgroundColor: Colors.green,
         shadowColor: Colors.lightGreen,
       ),
@@ -89,29 +103,11 @@ class _AddUnitDetails extends State<AddUnitDetails> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 8),
-            const Text(
-              "বিদ্রঃ আপনার বিল্ডিং এর প্রতিটি ইউনিট এর ভাড়াটিয়ার এবং দা তথ্য দিয়ে সহায়তা করুন ।",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w300,
-                color: Colors.red,
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              "বিল্ডিং এর তথ্যঃ  ",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w400,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-            const SizedBox(height: 8),
             TextField(
-              controller: floorController,
+              controller: phoneNumberController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                hintText: "আপনার বিল্ডিংটি কতো তলা*",
+                hintText: "ভাড়াটিয়ার ফোন নাম্বার*",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),
@@ -119,10 +115,10 @@ class _AddUnitDetails extends State<AddUnitDetails> {
             ),
             const SizedBox(height: 8),
             TextField(
-              controller: unitController,
+              controller: renterNameController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                hintText: "আপনার বিল্ডিংটি কতগুলো ইউনিট*",
+                hintText: "ভাড়াটিয়ার নাম*",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),
@@ -130,37 +126,92 @@ class _AddUnitDetails extends State<AddUnitDetails> {
             ),
             const SizedBox(height: 8),
             TextField(
-              controller: holdingNoController,
+              controller: houseRentController,
               keyboardType: TextInputType.name,
               decoration: InputDecoration(
-                hintText: "বাসা নং*",
+                hintText: "বাসা ভাড়া*",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),
               ),
             ),
             const SizedBox(height: 8),
-            TextField(
-              controller: addressController,
-              keyboardType: TextInputType.name,
-              decoration: InputDecoration(
-                hintText: "ঠিকানা (রোড নং,ব্লক নং,থানা,জেলা,বিভাগ)*",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(6),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: gasBillController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: "গ্যাস বিল",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                SizedBox(width: 8,),
+                Expanded(
+                  child: TextField(
+                    controller: waterBillController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: "পানি বিল",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                  ),
+                ),
+
+                SizedBox(width: 8,),
+                Expanded(
+                  child: TextField(
+                    controller: currentBillController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: "বিদ্যুৎ বিল",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                  ),
+                ),
+
+              ],
             ),
             const SizedBox(height: 8),
-            TextField(
-              controller: chargeController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                hintText: "সার্ভিস চারজ (যদি থাকে)",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(6),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: chargeController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: "সার্ভিস চার্জ (যদি থাকে)",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                SizedBox(width: 8,),
+                Expanded(
+                  child: TextField(
+                    controller: garageController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: "গ্যারেজ চার্জ (যদি থাকে)",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                  ),
+                ),
+
+              ],
             ),
+
             const SizedBox(height: 12),
 
             Container(
@@ -185,6 +236,7 @@ class _AddUnitDetails extends State<AddUnitDetails> {
                 ),
               ),
             ),
+          _unitList()
           ],
         ),
       ),
