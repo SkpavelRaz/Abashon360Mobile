@@ -116,6 +116,8 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
         ),
         backgroundColor: Colors.green,
         shadowColor: Colors.lightGreen,
+        automaticallyImplyLeading: false,
+
       ),
       body: _hasData ? _buildBuildingListView() : _buildFormView(),
     );
@@ -181,6 +183,14 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
                 ),
               ],
             ),
+            onTap: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddUnitDetails(buildingData: buildingList.first),
+                ),
+              );
+            },
           ),
         );
       },
@@ -255,7 +265,7 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
               controller: holdingNoController,
               keyboardType: TextInputType.name,
               decoration: InputDecoration(
-                hintText: "বাসা নং",
+                hintText: "বাসা নং*",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),
@@ -266,7 +276,7 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
               controller: addressController,
               keyboardType: TextInputType.name,
               decoration: InputDecoration(
-                hintText: "ঠিকানা (রোড নং,ব্লক নং,থানা,জেলা,বিভাগ*)",
+                hintText: "ঠিকানা (রোড নং,ব্লক নং,থানা,জেলা,বিভাগ)*",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),
@@ -384,10 +394,6 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "তথ্য সম্পাদনা করুন",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
                       const Text(
                         "তথ্য সম্পাদনা করুন",
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

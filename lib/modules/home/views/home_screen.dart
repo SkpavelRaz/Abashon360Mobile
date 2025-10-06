@@ -13,13 +13,12 @@ class _HomeScreen extends State<HomeScreen> {
   double profileCompletion = 0.25; // 25%
 
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
-        shadowColor: Colors.lightGreen,
+        elevation: 0,
       ),
       drawer: Drawer(
         child: ListView(

@@ -1,6 +1,7 @@
 
 import 'dart:math';
 
+import 'package:abashon_360_mobile/modules/dashboard/views/dashboard_screen.dart';
 import 'package:abashon_360_mobile/modules/home/views/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
@@ -51,7 +52,7 @@ class _PinViewSetupScreen extends State<PinViewSetupScreen>{
       Navigator.pop(context);
 
       if (response.status) {
-        Navigator.push(context,MaterialPageRoute(builder: (context)=>HomeScreen()));
+        Navigator.push(context,MaterialPageRoute(builder: (context)=>DashboardScreen()));
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(response.message)));
