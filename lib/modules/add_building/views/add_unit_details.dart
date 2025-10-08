@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../service/shared_preferences_service.dart';
 
 class AddUnitDetails extends StatefulWidget {
   final Map<String, dynamic> buildingData;
@@ -13,13 +11,21 @@ class AddUnitDetails extends StatefulWidget {
 
 class _AddUnitDetails extends State<AddUnitDetails> {
   final TextEditingController phoneNumberController = TextEditingController();
+  final TextEditingController phoneNumberDialogController = TextEditingController();
   final TextEditingController renterNameController = TextEditingController();
+  final TextEditingController renterNameDialogController = TextEditingController();
   final TextEditingController houseRentController = TextEditingController();
+  final TextEditingController houseRentDialogController = TextEditingController();
   final TextEditingController chargeController = TextEditingController();
+  final TextEditingController chargeDialogController = TextEditingController();
   final TextEditingController gasBillController = TextEditingController();
+  final TextEditingController gasBillDialogController = TextEditingController();
   final TextEditingController waterBillController = TextEditingController();
+  final TextEditingController waterBillDialogController = TextEditingController();
   final TextEditingController garageController = TextEditingController();
+  final TextEditingController garageDialogController = TextEditingController();
   final TextEditingController currentBillController = TextEditingController();
+  final TextEditingController currentBillDialogController = TextEditingController();
 
   List<Map<String, dynamic>> buildingUnitList = [];
 
@@ -54,22 +60,11 @@ class _AddUnitDetails extends State<AddUnitDetails> {
 
     setState(() {
       buildingUnitList.add(newData);
-      // _clearFields();
     });
 
     FocusScope.of(context).unfocus();
   }
 
-  void _clearFields() {
-    phoneNumberController.clear();
-    renterNameController.clear();
-    houseRentController.clear();
-    chargeController.clear();
-    gasBillController.clear();
-    waterBillController.clear();
-    currentBillController.clear();
-    garageController.clear();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -264,7 +259,7 @@ class _AddUnitDetails extends State<AddUnitDetails> {
                     IconButton(
                       icon: const Icon(Icons.edit, color: Colors.blue),
                       iconSize: 24,
-                      onPressed: () => _editUnit(index),
+                      onPressed: () => _openEditDialog(index),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
@@ -289,22 +284,7 @@ class _AddUnitDetails extends State<AddUnitDetails> {
     );
   }
 
-  // ================== EDIT / DELETE ==================
-  void _editUnit(int index) {
-    final unit = buildingUnitList[index];
-    phoneNumberController.text = unit['phone'];
-    renterNameController.text = unit['name'];
-    houseRentController.text = unit['rent'];
-    chargeController.text = unit['charge'];
-    gasBillController.text = unit['gas_bill'];
-    waterBillController.text = unit['water_bill'];
-    currentBillController.text = unit['current_bill'];
-    garageController.text = unit['garage_charge'];
-
-    setState(() {
-      buildingUnitList.removeAt(index);
-    });
-  }
+  // ================== EDIT / DELETE /SAVE ==================
 
   void _deleteUnit(int index) {
     setState(() {
@@ -312,6 +292,103 @@ class _AddUnitDetails extends State<AddUnitDetails> {
     });
     ScaffoldMessenger.of(context)
         .showSnackBar(const SnackBar(content: Text("ইউনিটটি মুছে ফেলা হয়েছে")));
+  }
+  void _openEditDialog(int index) {
+    final data = buildingUnitList[index];
+
+    // Pre-fill controllers
+    phoneNumberDialogController.text=data["phone"];
+    renterNameDialogController.text=data["name"];
+    houseRentDialogController.text=data["rent"];
+    chargeDialogController.text=data["charge"];
+    gasBillDialogController.text=data["gas_bill"];
+    currentBillDialogController.text=data["current_bill"];
+    waterBillDialogController.text=data["water_bill"];
+    garageDialogController.text=data["garage_charge"];
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return Dialog(
+              insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: const BorderSide(color: Colors.green, width: 2),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "তথ্য সম্পাদনা করুন",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 16),
+
+                      _buildPhoneTextField(phoneNumberDialogController, "ভাড়াটিয়ার ফোন নাম্বার*", TextInputType.phone),
+                      const SizedBox(height: 4),
+                      _buildTextField(renterNameDialogController, "ভাড়াটিয়ার নাম*", TextInputType.name),
+                      const SizedBox(height: 4),
+                      _buildTextField( houseRentDialogController,"ভাড়া",TextInputType.number),
+                      const SizedBox(height: 4),
+                      _buildTextField(gasBillDialogController,"গ্যাস",TextInputType.number),
+                      const SizedBox(height: 4),
+                      _buildTextField( waterBillDialogController,"পানি",TextInputType.number),
+                      const SizedBox(height: 4),
+                      _buildTextField(currentBillDialogController,"বিদ্যুৎ",TextInputType.number),
+                      const SizedBox(height: 4),
+                      _buildTextField( chargeDialogController,"সার্ভিস চার্জ",TextInputType.number),
+                      const SizedBox(height: 4),
+                      _buildTextField(garageDialogController,"গ্যারেজ", TextInputType.number),
+
+                      const SizedBox(height: 16),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("বাতিল"),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () => _saveEditedData(index),
+                            child: const Text("সংরক্ষণ"),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+  }
+  void _saveEditedData(int index) async {
+    final updatedData = {
+      "phone": phoneNumberDialogController.text,
+      "name": renterNameDialogController.text,
+      "rent": houseRentDialogController.text,
+      "charge": chargeDialogController.text,
+      "gas_bill": gasBillDialogController.text,
+      "current_bill": currentBillDialogController.text,
+      "water_bill": waterBillDialogController.text,
+      "garage_charge": garageDialogController.text,
+    };
+
+    setState(() {
+      buildingUnitList[index] = updatedData;
+    });
+
+    Navigator.pop(context); // Close dialog
   }
 
 //   =======================Api CAll======================
@@ -323,31 +400,6 @@ class _AddUnitDetails extends State<AddUnitDetails> {
       );
       return;
     }
-
-    // try {
-    //   final url = Uri.parse("https://your-api.com/units/submit");
-    //   final response = await http.post(
-    //     url,
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       'Authorization': 'Bearer YOUR_AUTH_TOKEN', // if needed
-    //     },
-    //     body: jsonEncode({'units': buildingUnitList}),
-    //   );
-    //
-    //   if (response.statusCode == 200) {
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       const SnackBar(content: Text("Units submitted successfully!")),
-    //     );
-    //   } else {
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       SnackBar(content: Text("Failed: ${response.body}")),
-    //     );
-    //   }
-    // } catch (e) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(content: Text("Error: $e")),
-    //   );
-    // }
   }
+
 }

@@ -463,7 +463,6 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
         );
       },
     );
-
   }
 
   Widget _buildTextField(String label, TextEditingController controller) {
