@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../add_building/views/add_building_screen.dart';
+import '../../history/house_rent_unit.dart';
 import '../../home/views/home_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -17,6 +18,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // Screens for bottom nav
   final List<Widget> _pages = [
     const HomeScreen(),
+    const HouseRentUnit(),
     const AddBuildingScreen(),
   ];
 
@@ -45,6 +47,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             label: "হোমপেজ",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history_outlined),
+            label: "বাড়ি ভাড়ার ইতিহাস",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add_outlined),

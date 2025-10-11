@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../service/shared_preferences_service.dart';
 
 class AddUnitDetails extends StatefulWidget {
   final Map<String, dynamic> buildingData;
@@ -10,6 +13,10 @@ class AddUnitDetails extends StatefulWidget {
 }
 
 class _AddUnitDetails extends State<AddUnitDetails> {
+  final TextEditingController floorController = TextEditingController();
+  final TextEditingController floorDialogController = TextEditingController();
+  final TextEditingController unitController = TextEditingController();
+  final TextEditingController unitDialogController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController phoneNumberDialogController = TextEditingController();
   final TextEditingController renterNameController = TextEditingController();
@@ -42,12 +49,15 @@ class _AddUnitDetails extends State<AddUnitDetails> {
     if (phoneNumberController.text.isEmpty ||
         renterNameController.text.isEmpty ||
         houseRentController.text.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("সব তথ্য পূরণ করুন")));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("সব তথ্য পূরণ করুন")));
       return;
     }
 
-    final newData = {
+    final newUnitData = {
+      "floor": floorController.text,
+      "unit": unitController.text,
       "phone": phoneNumberController.text,
       "name": renterNameController.text,
       "rent": houseRentController.text,
@@ -59,12 +69,16 @@ class _AddUnitDetails extends State<AddUnitDetails> {
     };
 
     setState(() {
-      buildingUnitList.add(newData);
+      buildingUnitList.add(newUnitData);
     });
+
+    final sharedPreferences = await SharedPreferences.getInstance();
+    await SharedPreferencesService(
+      sharedPreferences,
+    ).addUnitBuildingList(newUnitData);
 
     FocusScope.of(context).unfocus();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -93,23 +107,23 @@ class _AddUnitDetails extends State<AddUnitDetails> {
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 62),
               child: isWide
                   ? Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Left side: form
-                  Expanded(flex: 1, child: _buildForm()),
-                  const SizedBox(width: 16),
-                  // Right side: grid list
-                  Expanded(flex: 1, child: _unitList(crossAxisCount)),
-                ],
-              )
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Left side: form
+                        Expanded(flex: 1, child: _buildForm()),
+                        const SizedBox(width: 16),
+                        // Right side: grid list
+                        Expanded(flex: 1, child: _unitList(crossAxisCount)),
+                      ],
+                    )
                   : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildForm(),
-                  const SizedBox(height: 16),
-                  _unitList(crossAxisCount),
-                ],
-              ),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildForm(),
+                        const SizedBox(height: 16),
+                        _unitList(crossAxisCount),
+                      ],
+                    ),
             );
           },
         ),
@@ -132,27 +146,89 @@ class _AddUnitDetails extends State<AddUnitDetails> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            _buildPhoneTextField(phoneNumberController, "ভাড়াটিয়ার ফোন নাম্বার*", TextInputType.phone),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextField(
+                    floorController,
+                    "ফ্লোর নং*",
+                    TextInputType.number,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildTextField(
+                    unitController,
+                    "ইউনিট নং*",
+                    TextInputType.number,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 8),
-            _buildTextField(renterNameController, "ভাড়াটিয়ার নাম*", TextInputType.name),
+            _buildPhoneTextField(
+              phoneNumberController,
+              "ভাড়াটিয়ার ফোন নাম্বার*",
+              TextInputType.phone,
+            ),
             const SizedBox(height: 8),
-            _buildTextField(houseRentController, "বাসা ভাড়া*", TextInputType.number),
+            _buildTextField(
+              renterNameController,
+              "ভাড়াটিয়ার নাম*",
+              TextInputType.name,
+            ),
+            const SizedBox(height: 8),
+            _buildTextField(
+              houseRentController,
+              "বাসা ভাড়া*",
+              TextInputType.number,
+            ),
             const SizedBox(height: 8),
             Row(
               children: [
-                Expanded(child: _buildTextField(gasBillController, "গ্যাস বিল", TextInputType.number)),
+                Expanded(
+                  child: _buildTextField(
+                    gasBillController,
+                    "গ্যাস বিল",
+                    TextInputType.number,
+                  ),
+                ),
                 const SizedBox(width: 8),
-                Expanded(child: _buildTextField(waterBillController, "পানি বিল", TextInputType.number)),
+                Expanded(
+                  child: _buildTextField(
+                    waterBillController,
+                    "পানি বিল",
+                    TextInputType.number,
+                  ),
+                ),
                 const SizedBox(width: 8),
-                Expanded(child: _buildTextField(currentBillController, "বিদ্যুৎ বিল", TextInputType.number)),
+                Expanded(
+                  child: _buildTextField(
+                    currentBillController,
+                    "বিদ্যুৎ বিল",
+                    TextInputType.number,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 8),
             Row(
               children: [
-                Expanded(child: _buildTextField(chargeController, "সার্ভিস চার্জ (যদি থাকে)", TextInputType.number)),
+                Expanded(
+                  child: _buildTextField(
+                    chargeController,
+                    "সার্ভিস চার্জ (যদি থাকে)",
+                    TextInputType.number,
+                  ),
+                ),
                 const SizedBox(width: 8),
-                Expanded(child: _buildTextField(garageController, "গ্যারেজ চার্জ (যদি থাকে)", TextInputType.number)),
+                Expanded(
+                  child: _buildTextField(
+                    garageController,
+                    "গ্যারেজ চার্জ (যদি থাকে)",
+                    TextInputType.number,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -163,7 +239,10 @@ class _AddUnitDetails extends State<AddUnitDetails> {
                 icon: const Icon(Icons.save),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),
                   ),
@@ -180,18 +259,30 @@ class _AddUnitDetails extends State<AddUnitDetails> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, TextInputType type) {
+  Widget _buildTextField(
+    TextEditingController controller,
+    String hint,
+    TextInputType type,
+  ) {
     return TextField(
       controller: controller,
       keyboardType: type,
       decoration: InputDecoration(
         hintText: hint,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 10,
+        ),
       ),
     );
   }
-  Widget _buildPhoneTextField(TextEditingController controller, String hint, TextInputType type) {
+
+  Widget _buildPhoneTextField(
+    TextEditingController controller,
+    String hint,
+    TextInputType type,
+  ) {
     return TextField(
       controller: controller,
       keyboardType: type,
@@ -199,7 +290,10 @@ class _AddUnitDetails extends State<AddUnitDetails> {
       decoration: InputDecoration(
         hintText: hint,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 10,
+        ),
       ),
     );
   }
@@ -227,14 +321,21 @@ class _AddUnitDetails extends State<AddUnitDetails> {
         final unit = buildingUnitList[index];
         return Card(
           elevation: 3,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           child: Padding(
             padding: EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("ইউনিট ${index + 1}",
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                Text(
+                  "ইউনিট ${index + 1}",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
                 const SizedBox(height: 6),
                 Expanded(
                   child: SingleChildScrollView(
@@ -243,7 +344,9 @@ class _AddUnitDetails extends State<AddUnitDetails> {
                       children: [
                         _infoLine("📞", unit['phone']),
                         _infoLine("👤", unit['name']),
-                        _infoLine("🏠 ভাড়া:", unit['rent']),
+                        _infoLine("🏠 ফ্লোর:", unit['floor']),
+                        _infoLine("🧱 ইউনিট:", unit['unit']),
+                        _infoLine("💵 ভাড়া:", unit['rent']),
                         _infoLine("🔥 গ্যাস:", unit['gas_bill']),
                         _infoLine("💧 পানি:", unit['water_bill']),
                         _infoLine("⚡ বিদ্যুৎ:", unit['current_bill']),
@@ -279,7 +382,7 @@ class _AddUnitDetails extends State<AddUnitDetails> {
   Widget _infoLine(String icon, String value) {
     return Text(
       "$icon $value",
-      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400,),
+      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
       overflow: TextOverflow.ellipsis,
     );
   }
@@ -290,21 +393,24 @@ class _AddUnitDetails extends State<AddUnitDetails> {
     setState(() {
       buildingUnitList.removeAt(index);
     });
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text("ইউনিটটি মুছে ফেলা হয়েছে")));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("ইউনিটটি মুছে ফেলা হয়েছে")));
   }
+
   void _openEditDialog(int index) {
     final data = buildingUnitList[index];
-
     // Pre-fill controllers
-    phoneNumberDialogController.text=data["phone"];
-    renterNameDialogController.text=data["name"];
-    houseRentDialogController.text=data["rent"];
-    chargeDialogController.text=data["charge"];
-    gasBillDialogController.text=data["gas_bill"];
-    currentBillDialogController.text=data["current_bill"];
-    waterBillDialogController.text=data["water_bill"];
-    garageDialogController.text=data["garage_charge"];
+    floorDialogController.text = data["floor"];
+    unitDialogController.text = data["unit"];
+    phoneNumberDialogController.text = data["phone"];
+    renterNameDialogController.text = data["name"];
+    houseRentDialogController.text = data["rent"];
+    chargeDialogController.text = data["charge"];
+    gasBillDialogController.text = data["gas_bill"];
+    currentBillDialogController.text = data["current_bill"];
+    waterBillDialogController.text = data["water_bill"];
+    garageDialogController.text = data["garage_charge"];
 
     showDialog(
       context: context,
@@ -325,25 +431,68 @@ class _AddUnitDetails extends State<AddUnitDetails> {
                     children: [
                       const Text(
                         "তথ্য সম্পাদনা করুন",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 16),
 
-                      _buildPhoneTextField(phoneNumberDialogController, "ভাড়াটিয়ার ফোন নাম্বার*", TextInputType.phone),
+                      _buildPhoneTextField(
+                        floorDialogController,
+                        "ফ্লোর নং*",
+                        TextInputType.phone,
+                      ), _buildPhoneTextField(
+                        unitDialogController,
+                        "ইউনিট নং*",
+                        TextInputType.phone,
+                      ), _buildPhoneTextField(
+                        phoneNumberDialogController,
+                        "ভাড়াটিয়ার ফোন নাম্বার*",
+                        TextInputType.phone,
+                      ),
                       const SizedBox(height: 4),
-                      _buildTextField(renterNameDialogController, "ভাড়াটিয়ার নাম*", TextInputType.name),
+                      _buildTextField(
+                        renterNameDialogController,
+                        "ভাড়াটিয়ার নাম*",
+                        TextInputType.name,
+                      ),
                       const SizedBox(height: 4),
-                      _buildTextField( houseRentDialogController,"ভাড়া",TextInputType.number),
+                      _buildTextField(
+                        houseRentDialogController,
+                        "ভাড়া",
+                        TextInputType.number,
+                      ),
                       const SizedBox(height: 4),
-                      _buildTextField(gasBillDialogController,"গ্যাস",TextInputType.number),
+                      _buildTextField(
+                        gasBillDialogController,
+                        "গ্যাস",
+                        TextInputType.number,
+                      ),
                       const SizedBox(height: 4),
-                      _buildTextField( waterBillDialogController,"পানি",TextInputType.number),
+                      _buildTextField(
+                        waterBillDialogController,
+                        "পানি",
+                        TextInputType.number,
+                      ),
                       const SizedBox(height: 4),
-                      _buildTextField(currentBillDialogController,"বিদ্যুৎ",TextInputType.number),
+                      _buildTextField(
+                        currentBillDialogController,
+                        "বিদ্যুৎ",
+                        TextInputType.number,
+                      ),
                       const SizedBox(height: 4),
-                      _buildTextField( chargeDialogController,"সার্ভিস চার্জ",TextInputType.number),
+                      _buildTextField(
+                        chargeDialogController,
+                        "সার্ভিস চার্জ",
+                        TextInputType.number,
+                      ),
                       const SizedBox(height: 4),
-                      _buildTextField(garageDialogController,"গ্যারেজ", TextInputType.number),
+                      _buildTextField(
+                        garageDialogController,
+                        "গ্যারেজ",
+                        TextInputType.number,
+                      ),
 
                       const SizedBox(height: 16),
 
@@ -360,7 +509,7 @@ class _AddUnitDetails extends State<AddUnitDetails> {
                             child: const Text("সংরক্ষণ"),
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -370,10 +519,12 @@ class _AddUnitDetails extends State<AddUnitDetails> {
         );
       },
     );
-
   }
+
   void _saveEditedData(int index) async {
     final updatedData = {
+      "floor": floorDialogController.text,
+      "unit": unitDialogController.text,
       "phone": phoneNumberDialogController.text,
       "name": renterNameDialogController.text,
       "rent": houseRentDialogController.text,
@@ -391,15 +542,14 @@ class _AddUnitDetails extends State<AddUnitDetails> {
     Navigator.pop(context); // Close dialog
   }
 
-//   =======================Api CAll======================
+  //   =======================Api CAll======================
   // ✅ Submit List to API
   Future<void> submitUnitsToServer() async {
     if (buildingUnitList.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("No units to submit!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("No units to submit!")));
       return;
     }
   }
-
 }

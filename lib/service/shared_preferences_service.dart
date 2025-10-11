@@ -15,12 +15,21 @@ class SharedPreferencesService {
     await sharedPreferences.setStringList('items', items);
   }
 
-
-
   List<Map<String, dynamic>> getBuildingDetails() {
 
     List<String> items = sharedPreferences.getStringList('items') ?? [];
 
+    return items.map((e) => jsonDecode(e) as Map<String, dynamic>).toList();
+  }
+
+  Future<void> addUnitBuildingList(Map<String, dynamic> value) async {
+    List<String> items = sharedPreferences.getStringList('items') ?? [];
+    items.add(jsonEncode(value));
+    await sharedPreferences.setStringList('items', items);
+  }
+
+  List<Map<String, dynamic>> getUnitBuildingList() {
+    List<String> items = sharedPreferences.getStringList('items') ?? [];
     return items.map((e) => jsonDecode(e) as Map<String, dynamic>).toList();
   }
 
