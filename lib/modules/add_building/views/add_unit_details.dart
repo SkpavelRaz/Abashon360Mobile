@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../service/shared_preferences_service.dart';
@@ -18,21 +19,26 @@ class _AddUnitDetails extends State<AddUnitDetails> {
   final TextEditingController unitController = TextEditingController();
   final TextEditingController unitDialogController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
-  final TextEditingController phoneNumberDialogController = TextEditingController();
+  final TextEditingController phoneNumberDialogController =
+      TextEditingController();
   final TextEditingController renterNameController = TextEditingController();
-  final TextEditingController renterNameDialogController = TextEditingController();
+  final TextEditingController renterNameDialogController =
+      TextEditingController();
   final TextEditingController houseRentController = TextEditingController();
-  final TextEditingController houseRentDialogController = TextEditingController();
+  final TextEditingController houseRentDialogController =
+      TextEditingController();
   final TextEditingController chargeController = TextEditingController();
   final TextEditingController chargeDialogController = TextEditingController();
   final TextEditingController gasBillController = TextEditingController();
   final TextEditingController gasBillDialogController = TextEditingController();
   final TextEditingController waterBillController = TextEditingController();
-  final TextEditingController waterBillDialogController = TextEditingController();
+  final TextEditingController waterBillDialogController =
+      TextEditingController();
   final TextEditingController garageController = TextEditingController();
   final TextEditingController garageDialogController = TextEditingController();
   final TextEditingController currentBillController = TextEditingController();
-  final TextEditingController currentBillDialogController = TextEditingController();
+  final TextEditingController currentBillDialogController =
+      TextEditingController();
 
   List<Map<String, dynamic>> buildingUnitList = [];
 
@@ -67,6 +73,22 @@ class _AddUnitDetails extends State<AddUnitDetails> {
       "water_bill": waterBillController.text,
       "garage_charge": garageController.text,
     };
+
+    // 👉 Combine floor + unit as string
+    final newUnitKey = "${newUnitData['floor']}${newUnitData['unit']}".trim();
+
+    // 👉 Check if already exists
+    final exists = buildingUnitList.any((unit) {
+      final existingKey = "${unit['floor']}${unit['unit']}".trim();
+      return existingKey == newUnitKey;
+    });
+
+    if (exists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("এই ইউনিট আগে থেকেই যোগ করা আছে")),
+      );
+      return;
+    }
 
     setState(() {
       buildingUnitList.add(newUnitData);
@@ -157,7 +179,7 @@ class _AddUnitDetails extends State<AddUnitDetails> {
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _buildTextField(
+                  child: _buildUpperCaseTextField(
                     unitController,
                     "ইউনিট নং*",
                     TextInputType.number,
@@ -165,25 +187,25 @@ class _AddUnitDetails extends State<AddUnitDetails> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             _buildPhoneTextField(
               phoneNumberController,
               "ভাড়াটিয়ার ফোন নাম্বার*",
               TextInputType.phone,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             _buildTextField(
               renterNameController,
               "ভাড়াটিয়ার নাম*",
               TextInputType.name,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             _buildTextField(
               houseRentController,
               "বাসা ভাড়া*",
               TextInputType.number,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
@@ -211,7 +233,7 @@ class _AddUnitDetails extends State<AddUnitDetails> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
@@ -268,6 +290,28 @@ class _AddUnitDetails extends State<AddUnitDetails> {
       controller: controller,
       keyboardType: type,
       decoration: InputDecoration(
+        labelText:hint ,
+        hintText: hint,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 10,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUpperCaseTextField(
+    TextEditingController controller,
+    String hint,
+    TextInputType type,
+  ) {
+    return TextField(
+      controller: controller,
+      keyboardType: type,
+      inputFormatters: [UpperCaseTextFormatter()],
+      decoration: InputDecoration(
+        labelText:hint ,
         hintText: hint,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
         contentPadding: const EdgeInsets.symmetric(
@@ -288,6 +332,7 @@ class _AddUnitDetails extends State<AddUnitDetails> {
       keyboardType: type,
       maxLength: 11,
       decoration: InputDecoration(
+        labelText:hint ,
         hintText: hint,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
         contentPadding: const EdgeInsets.symmetric(
@@ -330,7 +375,7 @@ class _AddUnitDetails extends State<AddUnitDetails> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "ইউনিট ${index + 1}",
+                  "ইউনিট: ${unit['floor']}${unit['unit']}",
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -344,8 +389,6 @@ class _AddUnitDetails extends State<AddUnitDetails> {
                       children: [
                         _infoLine("📞", unit['phone']),
                         _infoLine("👤", unit['name']),
-                        _infoLine("🏠 ফ্লোর:", unit['floor']),
-                        _infoLine("🧱 ইউনিট:", unit['unit']),
                         _infoLine("💵 ভাড়া:", unit['rent']),
                         _infoLine("🔥 গ্যাস:", unit['gas_bill']),
                         _infoLine("💧 পানি:", unit['water_bill']),
@@ -438,15 +481,20 @@ class _AddUnitDetails extends State<AddUnitDetails> {
                       ),
                       const SizedBox(height: 16),
 
-                      _buildPhoneTextField(
+                      _buildTextField(
                         floorDialogController,
                         "ফ্লোর নং*",
                         TextInputType.phone,
-                      ), _buildPhoneTextField(
+                      ),
+                      const SizedBox(height: 4),
+                      _buildUpperCaseTextField(
                         unitDialogController,
                         "ইউনিট নং*",
                         TextInputType.phone,
-                      ), _buildPhoneTextField(
+                      ),
+
+                      const SizedBox(height: 4),
+                      _buildPhoneTextField(
                         phoneNumberDialogController,
                         "ভাড়াটিয়ার ফোন নাম্বার*",
                         TextInputType.phone,
@@ -551,5 +599,18 @@ class _AddUnitDetails extends State<AddUnitDetails> {
       ).showSnackBar(const SnackBar(content: Text("No units to submit!")));
       return;
     }
+  }
+}
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
   }
 }

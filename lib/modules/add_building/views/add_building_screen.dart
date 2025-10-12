@@ -99,6 +99,12 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
     final spService = SharedPreferencesService(prefs);
 
     List<Map<String, dynamic>> data = spService.getBuildingDetails();
+    // ✅ Ensure all boolean keys exist
+    for (var item in data) {
+      item["lift"] = item["lift"] ?? false;
+      item["garage"] = item["garage"] ?? false;
+      item["guard"] = item["guard"] ?? false;
+    }
 
     setState(() {
       buildingList = data;
@@ -146,11 +152,11 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "তলা: ${data["floor"]}, ইউনিট: ${data["unit"]}",
+                  "তলা: ${data["floor"]??"N/A"}, ইউনিট: ${data["unit"]??"N/A"}",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                 ),
                 Text(
-                  "ঠিকানা: ${data["address"]}",
+                  "ঠিকানা: ${data["address"]??"N/A"}",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
                 ),
                 Text(
@@ -159,7 +165,7 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
                 ),
                 if (features.isNotEmpty)
                   Text(
-                    "সুবিধা: ${features.join(", ")}",
+                    "সুবিধা: ${features.join(", ")??"N/A"}",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                   ),
               ],

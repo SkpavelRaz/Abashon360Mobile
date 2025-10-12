@@ -23,13 +23,13 @@ class SharedPreferencesService {
   }
 
   Future<void> addUnitBuildingList(Map<String, dynamic> value) async {
-    List<String> items = sharedPreferences.getStringList('items') ?? [];
+    List<String> items = sharedPreferences.getStringList('unit_items') ?? [];
     items.add(jsonEncode(value));
-    await sharedPreferences.setStringList('items', items);
+    await sharedPreferences.setStringList('unit_items', items);
   }
 
   List<Map<String, dynamic>> getUnitBuildingList() {
-    List<String> items = sharedPreferences.getStringList('items') ?? [];
+    List<String> items = sharedPreferences.getStringList('unit_items') ?? [];
     return items.map((e) => jsonDecode(e) as Map<String, dynamic>).toList();
   }
 
