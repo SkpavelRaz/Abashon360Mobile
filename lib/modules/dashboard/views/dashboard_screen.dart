@@ -34,7 +34,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _selectedIndex = index;
     });
 
-    // ✅ Reload HouseRentUnit when its tab is selected
     if (index == 1) {
       houseRentKey.currentState?.loadData();
     }
