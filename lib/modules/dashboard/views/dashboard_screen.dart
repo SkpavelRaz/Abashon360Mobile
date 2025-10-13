@@ -12,27 +12,38 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  double profileCompletion = 0.25; // Profile progress (25%)
-  int _selectedIndex = 0; // Track current page index
+  final GlobalKey<HouseRentUnitState> houseRentKey = GlobalKey<HouseRentUnitState>();
 
-  // Screens for bottom nav
-  final List<Widget> _pages = [
-    const HomeScreen(),
-    const HouseRentUnit(),
-    const AddBuildingScreen(),
-  ];
+  int _selectedIndex = 0;
+
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      const HomeScreen(),
+      HouseRentUnit(key: houseRentKey), // key passed here
+      const AddBuildingScreen(),
+      const Placeholder(), // Search page
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+
+    // ✅ Reload HouseRentUnit when its tab is selected
+    if (index == 1) {
+      houseRentKey.currentState?.loadData();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
-        // keeps state of all pages
         index: _selectedIndex,
         children: _pages,
       ),
