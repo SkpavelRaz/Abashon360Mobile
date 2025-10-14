@@ -54,4 +54,14 @@ class SharedPreferencesService {
 
     await sharedPreferences.setStringList('items', items);
   }
+
+  Future<void> updateUnitAtIndex(int index, Map<String, dynamic> newValue) async {
+    List<String> items = sharedPreferences.getStringList('unit_items') ?? [];
+
+    if (index < 0 || index >= items.length) return; // Safety check
+
+    items[index] = jsonEncode(newValue); // Replace with updated value
+
+    await sharedPreferences.setStringList('unit_items', items);
+  }
 }

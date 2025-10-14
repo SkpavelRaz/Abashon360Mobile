@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../service/shared_preferences_service.dart';
+import 'house_rent_details.dart';
 
 class HouseRentUnit extends StatefulWidget {
   const HouseRentUnit({super.key});
@@ -113,12 +114,23 @@ class HouseRentUnitState extends State<HouseRentUnit> {
                   alignment: Alignment.centerRight,
                   child: Stack(
                     children: [
-                      Text(
-                        "বিস্তারিত ->",
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.green,
+                      GestureDetector(
+                        onTap: () {
+                          // Example: pass index = 3
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HouseRentDetails(index: index),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          "বিস্তারিত ->",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.green,
+                          ),
                         ),
                       ),
                       Positioned(
