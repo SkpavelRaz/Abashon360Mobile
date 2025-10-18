@@ -88,11 +88,6 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
     loadData(); // Reloads every time when page becomes active again
   }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   loadData();
-  // }
 
   void loadData() async {
     final prefs = await SharedPreferences.getInstance();
