@@ -45,6 +45,7 @@ class _CollectHouseRent extends State<CollectHouseRent> {
     } else if (screenWidth > 300) {
       crossAxisCount = 2;
     }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.buildingData.replaceAll("\n", " ")),
