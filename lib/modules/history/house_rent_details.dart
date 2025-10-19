@@ -38,11 +38,11 @@ class _HouseRentDetails extends State<HouseRentDetails>{
         phoneNumberController.text = item["phone"] ?? "";
         renterNameController.text = item["renterName"] ?? "";
         houseRentController.text = item["rent"] ?? "";
-        gasBillController.text = item["gas"] ?? "";
-        waterBillController.text = item["water"] ?? "";
-        currentBillController.text = item["current"] ?? "";
+        gasBillController.text = item["gas_bill"] ?? "";
+        waterBillController.text = item["water_bill"] ?? "";
+        currentBillController.text = item["current_bill"] ?? "";
         chargeController.text = item["charge"] ?? "";
-        garageController.text = item["garage"] ?? "";
+        garageController.text = item["garage_charge"] ?? "";
       }
     });
 
