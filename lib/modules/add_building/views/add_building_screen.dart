@@ -121,6 +121,12 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
 
       ),
       body: _hasData ? _buildBuildingListView() : _buildFormView(),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed:(){},
+        label: const Text("যোগ করুন"),
+        icon: Icon(Icons.add_home_work_rounded,size: 32,),
+        backgroundColor: Colors.green,
+      ),
     );
   }
 
