@@ -8,10 +8,10 @@ class AddBuildingScreen extends StatefulWidget {
   const AddBuildingScreen({super.key});
 
   @override
-  State<StatefulWidget> createState() => _AddBuildingScreen();
+  State<AddBuildingScreen> createState() => AddBuildingScreenState();
 }
 
-class _AddBuildingScreen extends State<AddBuildingScreen> {
+class AddBuildingScreenState extends State<AddBuildingScreen> {
   SharedPreferencesService? service;
   bool _hasData = false;
 
@@ -54,7 +54,6 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
     setState(() {
       buildingList.add(newData);
 
-      // Reset form
       floorController.clear();
       unitController.clear();
       holdingNoController.clear();
@@ -65,36 +64,34 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
       isCheckedGuard = false;
     });
 
-    // Save to SharedPreferences (MUST be outside setState)
     final sharedPreferences = await SharedPreferences.getInstance();
     await SharedPreferencesService(
       sharedPreferences,
     ).addBuildingDetails(newData);
 
     // Navigate
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AddUnitDetails(buildingData: newData),
-      ),
-    );
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => AddUnitDetails(buildingData: newData),
+    //   ),
+    // );
+    loadData();
 
     FocusScope.of(context).unfocus();
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    loadData(); // Reloads every time when page becomes active again
+  void initState() {
+    super.initState();
+    loadData();
   }
-
 
   void loadData() async {
     final prefs = await SharedPreferences.getInstance();
     final spService = SharedPreferencesService(prefs);
 
     List<Map<String, dynamic>> data = spService.getBuildingDetails();
-    // ✅ Ensure all boolean keys exist
     for (var item in data) {
       item["lift"] = item["lift"] ?? false;
       item["garage"] = item["garage"] ?? false;
@@ -118,15 +115,20 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
         backgroundColor: Colors.green,
         shadowColor: Colors.lightGreen,
         automaticallyImplyLeading: false,
-
       ),
       body: _hasData ? _buildBuildingListView() : _buildFormView(),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed:(){},
-        label: const Text("যোগ করুন"),
-        icon: Icon(Icons.add_home_work_rounded,size: 32,),
-        backgroundColor: Colors.green,
-      ),
+      floatingActionButton: _hasData
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                setState(() {
+                  _hasData = false;
+                });
+              },
+              label: const Text("যোগ করুন"),
+              icon: const Icon(Icons.add_home_work_rounded, size: 32),
+              backgroundColor: Colors.green,
+            )
+          : null,
     );
   }
 
@@ -153,11 +155,11 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "তলা: ${data["floor"]??"N/A"}, ইউনিট: ${data["unit"]??"N/A"}",
+                  "তলা: ${data["floor"] ?? "N/A"}, ইউনিট: ${data["unit"] ?? "N/A"}",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                 ),
                 Text(
-                  "ঠিকানা: ${data["address"]??"N/A"}",
+                  "ঠিকানা: ${data["address"] ?? "N/A"}",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
                 ),
                 Text(
@@ -166,7 +168,7 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
                 ),
                 if (features.isNotEmpty)
                   Text(
-                    "সুবিধা: ${features.join(", ")??"N/A"}",
+                    "সুবিধা: ${features.join(", ")}",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                   ),
               ],
@@ -190,11 +192,12 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
                 ),
               ],
             ),
-            onTap: (){
+            onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AddUnitDetails(buildingData: buildingList.first),
+                  builder: (context)=>
+                      AddUnitDetails(buildingData: buildingList[index]),
                 ),
               );
             },
@@ -403,7 +406,10 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
                     children: [
                       const Text(
                         "তথ্য সম্পাদনা করুন",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 16),
 
@@ -420,7 +426,8 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
                         title: const Text("লিফ্ট আছে"),
                         value: isCheckedLift,
                         onChanged: (val) {
-                          setStateDialog(() { // <-- use this, not main setState!
+                          setStateDialog(() {
+                            // <-- use this, not main setState!
                             isCheckedLift = val!;
                           });
                         },
@@ -460,7 +467,7 @@ class _AddBuildingScreen extends State<AddBuildingScreen> {
                             child: const Text("সংরক্ষণ"),
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),

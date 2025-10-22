@@ -19,8 +19,7 @@ class _AddUnitDetails extends State<AddUnitDetails> {
   final TextEditingController unitController = TextEditingController();
   final TextEditingController unitDialogController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
-  final TextEditingController phoneNumberDialogController =
-      TextEditingController();
+  final TextEditingController phoneNumberDialogController = TextEditingController();
   final TextEditingController renterNameController = TextEditingController();
   final TextEditingController renterNameDialogController =
       TextEditingController();
@@ -62,6 +61,7 @@ class _AddUnitDetails extends State<AddUnitDetails> {
     }
 
     final newUnitData = {
+      "holding_no":widget.buildingData["holding_no"],
       "floor": floorController.text,
       "unit": unitController.text,
       "phone": phoneNumberController.text,
@@ -168,6 +168,12 @@ class _AddUnitDetails extends State<AddUnitDetails> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            Text(
+              "বাসা নং: ${widget.buildingData["holding_no"]}",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
@@ -182,7 +188,7 @@ class _AddUnitDetails extends State<AddUnitDetails> {
                   child: _buildUpperCaseTextField(
                     unitController,
                     "ইউনিট নং*",
-                    TextInputType.number,
+                    TextInputType.text,
                   ),
                 ),
               ],
@@ -490,9 +496,8 @@ class _AddUnitDetails extends State<AddUnitDetails> {
                       _buildUpperCaseTextField(
                         unitDialogController,
                         "ইউনিট নং*",
-                        TextInputType.phone,
+                        TextInputType.text,
                       ),
-
                       const SizedBox(height: 14),
                       _buildPhoneTextField(
                         phoneNumberDialogController,

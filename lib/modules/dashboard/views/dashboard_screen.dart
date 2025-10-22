@@ -12,7 +12,10 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final GlobalKey<HouseRentUnitState> houseRentKey = GlobalKey<HouseRentUnitState>();
+  final GlobalKey<HouseRentUnitState> houseRentKey =
+      GlobalKey<HouseRentUnitState>();
+  final GlobalKey<AddBuildingScreenState> addBuildingKey =
+      GlobalKey<AddBuildingScreenState>();
 
   int _selectedIndex = 0;
 
@@ -24,7 +27,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _pages = [
       const HomeScreen(),
       HouseRentUnit(key: houseRentKey), // key passed here
-      const AddBuildingScreen(),
+      AddBuildingScreen(key: addBuildingKey),
       const Placeholder(), // Search page
     ];
   }
@@ -37,15 +40,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (index == 1) {
       houseRentKey.currentState?.loadData();
     }
+    if (index == 2) {
+      addBuildingKey.currentState?.loadData();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _selectedIndex, children: _pages),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,

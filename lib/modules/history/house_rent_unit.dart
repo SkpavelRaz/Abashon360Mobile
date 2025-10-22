@@ -13,6 +13,7 @@ class HouseRentUnit extends StatefulWidget {
 
 class HouseRentUnitState extends State<HouseRentUnit> {
   List<Map<String, dynamic>> buildingUnitList = [];
+  Map<String, List<Map<String, dynamic>>> groupedUnits = {};
 
   Future<void> loadData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -21,7 +22,22 @@ class HouseRentUnitState extends State<HouseRentUnit> {
     final data = spService.getUnitBuildingList();
     setState(() {
       buildingUnitList = data;
+      groupedUnits = _groupByHoldingNo(data);
     });
+  }
+
+  /// Groups list by holding_no
+  Map<String, List<Map<String, dynamic>>> _groupByHoldingNo(List<Map<String, dynamic>> units) {
+    final Map<String, List<Map<String, dynamic>>> grouped = {};
+    for (var unit in units) {
+      final holding = unit['holding_no'] ?? 'Unknown';
+      if (grouped.containsKey(holding)) {
+        grouped[holding]!.add(unit);
+      } else {
+        grouped[holding] = [unit];
+      }
+    }
+    return grouped;
   }
 
   @override
@@ -32,18 +48,6 @@ class HouseRentUnitState extends State<HouseRentUnit> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    // Responsive column count
-    int crossAxisCount = 1;
-    if (screenWidth > 800) {
-      crossAxisCount = 4;
-    } else if (screenWidth > 500) {
-      crossAxisCount = 3;
-    } else if (screenWidth > 300) {
-      crossAxisCount = 2;
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -54,12 +58,12 @@ class HouseRentUnitState extends State<HouseRentUnit> {
         shadowColor: Colors.lightGreen,
         automaticallyImplyLeading: false,
       ),
-      body: _buildListView(crossAxisCount),
+      body: _buildGroupedListView(),
     );
   }
 
-  Widget _buildListView(int crossAxisCount) {
-    if (buildingUnitList.isEmpty) {
+  Widget _buildGroupedListView() {
+    if (groupedUnits.isEmpty) {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(16),
@@ -68,96 +72,76 @@ class HouseRentUnitState extends State<HouseRentUnit> {
       );
     }
 
-    return GridView.builder(
-      itemCount: buildingUnitList.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 0.80,
-      ),
-      itemBuilder: (context, index) {
-        final unit = buildingUnitList[index];
+    return ListView(
+      padding: const EdgeInsets.all(10),
+      children: groupedUnits.entries.map((entry) {
+        final holdingNo = entry.key;
+        final units = entry.value;
+
         return Card(
+          margin: const EdgeInsets.only(bottom: 10),
           elevation: 3,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "ইউনিট: ${unit['floor']}${unit['unit']}",
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          child: ExpansionTile(
+            title: Text(
+              "হোল্ডিং নং: $holdingNo",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            children: units.map((unit) {
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(height: 6),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _infoLine("📞", unit['phone'] ?? "N/A"),
-                        _infoLine("👤", unit['name'] ?? "N/A"),
-                        _infoLine("💵 ভাড়া:", unit['rent'] ?? "N/A"),
-                        _infoLine("🔥 গ্যাস:", unit['gas_bill'] ?? "N/A"),
-                        _infoLine("💧 পানি:", unit['water_bill'] ?? "N/A"),
-                        _infoLine("⚡ বিদ্যুৎ:", unit['current_bill'] ?? "N/A"),
-                        _infoLine("💼 সার্ভিস:", unit['charge'] ?? "N/A"),
-                        _infoLine("🚗 গ্যারেজ:", unit['garage_charge'] ?? "N/A"),
-                      ],
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Stack(
-                    children: [
-                      GestureDetector(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("👤 ${unit['name'] ?? 'N/A'}",
+                        style: const TextStyle(fontWeight: FontWeight.w500)),
+                    Text("📞 ${unit['phone'] ?? 'N/A'}"),
+                    Text("💵 ভাড়া: ${unit['rent'] ?? 'N/A'}"),
+                    Text("🔥 গ্যাস: ${unit['gas_bill'] ?? 'N/A'}"),
+                    Text("💧 পানি: ${unit['water_bill'] ?? 'N/A'}"),
+                    Text("⚡ বিদ্যুৎ: ${unit['current_bill'] ?? 'N/A'}"),
+                    Text("💼 সার্ভিস: ${unit['charge'] ?? 'N/A'}"),
+                    Text("🚗 গ্যারেজ: ${unit['garage_charge'] ?? 'N/A'}"),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
                         onTap: () {
-                          // Example: pass index = 3
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => HouseRentDetails(index: index),
+                              builder: (context) => HouseRentDetails(
+                                index: buildingUnitList.indexOf(unit),
+                              ),
                             ),
                           );
                         },
                         child: const Text(
-                          "বিস্তারিত ->",
+                          "বিস্তারিত →",
                           style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
                             color: Colors.green,
+                            decoration: TextDecoration.underline,
+                            decorationColor: Colors.green,
                           ),
                         ),
                       ),
-                      Positioned(
-                        bottom: -1,
-                        left: 0,
-                        right: 0,
-                        child: Container(
-                          height: 2,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
           ),
         );
-      },
-    );
-  }
-
-  Widget _infoLine(String icon, String value) {
-    return Text(
-      "$icon $value",
-      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
-      overflow: TextOverflow.ellipsis,
+      }).toList(),
     );
   }
 }
