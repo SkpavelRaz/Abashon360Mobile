@@ -15,9 +15,9 @@ class AddUnitDetails extends StatefulWidget {
 
 class _AddUnitDetails extends State<AddUnitDetails> {
   final TextEditingController floorController = TextEditingController();
-  final TextEditingController floorDialogController = TextEditingController();
+  // final TextEditingController floorDialogController = TextEditingController();
   final TextEditingController unitController = TextEditingController();
-  final TextEditingController unitDialogController = TextEditingController();
+  // final TextEditingController unitDialogController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController phoneNumberDialogController = TextEditingController();
   final TextEditingController renterNameController = TextEditingController();
@@ -177,19 +177,12 @@ class _AddUnitDetails extends State<AddUnitDetails> {
             Row(
               children: [
                 Expanded(
-                  child: _buildTextField(
-                    floorController,
-                    "ফ্লোর নং*",
-                    TextInputType.number,
-                  ),
+                  child: _buildFloorDropdown(floorController, widget.buildingData),
+
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _buildUpperCaseTextField(
-                    unitController,
-                    "ইউনিট নং*",
-                    TextInputType.text,
-                  ),
+                  child: _buildUnitDropdown(unitController, widget.buildingData),
                 ),
               ],
             ),
@@ -307,27 +300,6 @@ class _AddUnitDetails extends State<AddUnitDetails> {
     );
   }
 
-  Widget _buildUpperCaseTextField(
-    TextEditingController controller,
-    String hint,
-    TextInputType type,
-  ) {
-    return TextField(
-      controller: controller,
-      keyboardType: type,
-      inputFormatters: [UpperCaseTextFormatter()],
-      decoration: InputDecoration(
-        labelText:hint ,
-        hintText: hint,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 10,
-        ),
-      ),
-    );
-  }
-
   Widget _buildPhoneTextField(
     TextEditingController controller,
     String hint,
@@ -381,7 +353,7 @@ class _AddUnitDetails extends State<AddUnitDetails> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "ইউনিট: ${unit['floor']}${unit['unit']}",
+                  "ইউনিট: ${unit['floor']}-${unit['unit']}",
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -436,6 +408,74 @@ class _AddUnitDetails extends State<AddUnitDetails> {
     );
   }
 
+  // =================Floor DropDown============================
+  Widget _buildFloorDropdown(TextEditingController controller, Map<String, dynamic> data) {
+    int totalFloors = int.tryParse(data["floor"].toString()) ?? 0;
+    String? selectedFloor;
+    List<String> floors = [];
+    for (int i = 0; i < totalFloors; i++) {
+      if (i == 0) {
+        floors.add("Ground Floor");
+      } else if (i == 1) {
+        floors.add("1st");
+      } else if (i == 2) {
+        floors.add("2nd");
+      } else if (i == 3) {
+        floors.add("3rd");
+      } else {
+        floors.add("${i}th");
+      }
+    }
+
+    return DropdownButtonFormField<String>(
+      initialValue: selectedFloor,
+      decoration: InputDecoration(
+        labelText: "ফ্লোর নং*",
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      ),
+      items: floors.map((floor) {
+        return DropdownMenuItem<String>(
+          value: floor,
+          child: Text(floor),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          selectedFloor = value;
+          controller.text = value ?? '';
+        });
+      },
+    );
+  }
+
+  Widget _buildUnitDropdown(TextEditingController controller, Map<String, dynamic> data) {
+    int totalUnits = int.tryParse(data["unit"].toString()) ?? 0;
+
+    List<String> units = List.generate(totalUnits, (index) => String.fromCharCode(65 + index));
+
+    return DropdownButtonFormField<String>(
+      initialValue: controller.text.isNotEmpty ? controller.text : null,
+      decoration: InputDecoration(
+        labelText: "ইউনিট নং*",
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      ),
+      items: units.map((unit) {
+        return DropdownMenuItem<String>(
+          value: unit,
+          child: Text(unit),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          controller.text = value ?? '';
+        });
+      },
+    );
+  }
+
+
   // ================== EDIT / DELETE /SAVE ==================
 
   void _deleteUnit(int index) {
@@ -450,8 +490,8 @@ class _AddUnitDetails extends State<AddUnitDetails> {
   void _openEditDialog(int index) {
     final data = buildingUnitList[index];
     // Pre-fill controllers
-    floorDialogController.text = data["floor"];
-    unitDialogController.text = data["unit"];
+    // floorDialogController.text = data["floor"];
+    // unitDialogController.text = data["unit"];
     phoneNumberDialogController.text = data["phone"];
     renterNameDialogController.text = data["name"];
     houseRentDialogController.text = data["rent"];
@@ -487,18 +527,26 @@ class _AddUnitDetails extends State<AddUnitDetails> {
                       ),
                       const SizedBox(height: 16),
 
-                      _buildTextField(
-                        floorDialogController,
-                        "ফ্লোর নং*",
-                        TextInputType.phone,
+                      Text(
+                        "ইউনিট: ${data["floor"]}-${data["unit"]}",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                        ),
                       ),
-                      const SizedBox(height: 14),
-                      _buildUpperCaseTextField(
-                        unitDialogController,
-                        "ইউনিট নং*",
-                        TextInputType.text,
-                      ),
-                      const SizedBox(height: 14),
+
+                      // _buildTextField(
+                      //   floorDialogController,
+                      //   "ফ্লোর নং*",
+                      //   TextInputType.phone,
+                      // ),
+                      // const SizedBox(height: 14),
+                      // _buildUpperCaseTextField(
+                      //   unitDialogController,
+                      //   "ইউনিট নং*",
+                      //   TextInputType.text,
+                      // ),
+                      const SizedBox(height: 16),
                       _buildPhoneTextField(
                         phoneNumberDialogController,
                         "ভাড়াটিয়ার ফোন নাম্বার*",
@@ -576,8 +624,8 @@ class _AddUnitDetails extends State<AddUnitDetails> {
 
   void _saveEditedData(int index) async {
     final updatedData = {
-      "floor": floorDialogController.text,
-      "unit": unitDialogController.text,
+      // "floor": floorDialogController.text,
+      // "unit": unitDialogController.text,
       "phone": phoneNumberDialogController.text,
       "name": renterNameDialogController.text,
       "rent": houseRentDialogController.text,

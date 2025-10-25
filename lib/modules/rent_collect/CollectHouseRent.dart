@@ -16,6 +16,7 @@ class _CollectHouseRent extends State<CollectHouseRent> {
 
   final TextEditingController collectRentController = TextEditingController();
   List<Map<String, dynamic>> buildingUnitList = [];
+  Map<String, List<Map<String, dynamic>>> groupedUnits = {};
 
   Future<void> loadData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -24,7 +25,21 @@ class _CollectHouseRent extends State<CollectHouseRent> {
     final data = spService.getUnitBuildingList();
     setState(() {
       buildingUnitList = data;
+      groupedUnits = _groupByHoldingNo(data);
     });
+  }
+  /// Groups list by holding_no
+  Map<String, List<Map<String, dynamic>>> _groupByHoldingNo(List<Map<String, dynamic>> units) {
+    final Map<String, List<Map<String, dynamic>>> grouped = {};
+    for (var unit in units) {
+      final holding = unit['holding_no'] ?? 'Unknown';
+      if (grouped.containsKey(holding)) {
+        grouped[holding]!.add(unit);
+      } else {
+        grouped[holding] = [unit];
+      }
+    }
+    return grouped;
   }
 
   @override
@@ -57,7 +72,7 @@ class _CollectHouseRent extends State<CollectHouseRent> {
   }
 
   Widget _buildListView(int crossAxisCount) {
-    if (buildingUnitList.isEmpty) {
+    if (groupedUnits.isEmpty) {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(16),
@@ -66,110 +81,84 @@ class _CollectHouseRent extends State<CollectHouseRent> {
       );
     }
 
-    return GridView.builder(
-      padding: EdgeInsets.all(16),
-      itemCount: buildingUnitList.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 0.90,
-      ),
-      itemBuilder: (context, index) {
-        final unit = buildingUnitList[index];
+    return ListView(
+      padding: const EdgeInsets.all(10),
+      children: groupedUnits.entries.map((entry) {
+        final holdingNo = entry.key;
+        final units = entry.value;
+
         return Card(
+          margin: const EdgeInsets.only(bottom: 10),
           elevation: 3,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "ইউনিট: ${unit['floor']}${unit['unit']}",
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          child: ExpansionTile(
+            title: Text(
+              "হোল্ডিং নং: $holdingNo",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            children: units.map((unit) {
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(height: 2),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                        _infoTitleLine("","January"),
-                        SizedBox(height: 8,),
-                        _infoLine("📞", unit['phone'] ?? "N/A"),
-                        SizedBox(height: 2,),
-                        _infoLine("👤", unit['name'] ?? "N/A"),
-                        SizedBox(height: 2,),
-                        _infoLine("💵 ভাড়া:", unit['rent'] ?? "N/A"),
-
+                        Expanded(child:  Text(
+                          "ইউনিট: ${unit['floor']}-${unit['unit']}",
+                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+                        ),),
+                        Expanded(child:  _infoTitleLine("","January"),
+                        )
                       ],
                     ),
-                  ),
+                    SizedBox(height: 8),
+                    Text("👤 ${unit['name'] ?? 'N/A'}",
+                        style: const TextStyle(fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 2),
+                    _infoLine("📞", unit['phone'] ?? "N/A"),
+                    SizedBox(height: 2,),
+                    _infoLine("👤", unit['name'] ?? "N/A"),
+                    SizedBox(height: 2,),
+                    _infoLine("💵 ভাড়া:", unit['rent'] ?? "N/A"),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: SizedBox(
+                        width:100,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          onPressed: () => _openEditDialog(buildingUnitList.indexOf(unit)),
+                          child: const Text(
+                            "সংগৃহীত",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: SizedBox(
-                    width: 200,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      onPressed: () => _openEditDialog(index),
-                      child: const Text(
-                        "সংগৃহীত",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  // child: Stack(
-                  //   children: [
-                  //     GestureDetector(
-                  //       onTap: () {
-                  //         // Example: pass index = 3
-                  //         // Navigator.push(
-                  //         //   context,
-                  //         //   MaterialPageRoute(
-                  //         //     builder: (context) => HouseRentDetails(index: index),
-                  //         //   ),
-                  //         // );
-                  //       },
-                  //       child: const Text(
-                  //         "বিস্তারিত ->",
-                  //         style: TextStyle(
-                  //           fontSize: 20,
-                  //           fontWeight: FontWeight.w800,
-                  //           color: Colors.green,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //     Positioned(
-                  //       bottom: -1,
-                  //       left: 0,
-                  //       right: 0,
-                  //       child: Container(
-                  //         height: 2,
-                  //         color: Colors.green,
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                )
-              ],
-            ),
+              );
+            }).toList(),
           ),
         );
-      },
+      }).toList(),
     );
   }
 
@@ -184,7 +173,8 @@ class _CollectHouseRent extends State<CollectHouseRent> {
   Widget _infoTitleLine(String icon, String value) {
     return Text(
       "$icon $value",
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800,color: Colors.lightGreen),
+      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800,color: Colors.lightGreen),
+      textAlign: TextAlign.end,
       overflow: TextOverflow.ellipsis,
     );
   }
@@ -221,7 +211,7 @@ class _CollectHouseRent extends State<CollectHouseRent> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                       "ইউনিট: ${data["floor"]}${data["unit"]}",
+                       "ইউনিট: ${data["floor"]}-${data["unit"]}",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,

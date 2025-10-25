@@ -33,8 +33,8 @@ class _HouseRentDetails extends State<HouseRentDetails>{
 
       if (widget.index < buildingUnitList.length) {
         var item = buildingUnitList[widget.index];
-        floorController.text = item["floor"] ?? "";
-        unitController.text = item["unit"] ?? "";
+        // floorController.text = item["floor"] ?? "";
+        // unitController.text = item["unit"] ?? "";
         phoneNumberController.text = item["phone"] ?? "";
         renterNameController.text = item["renterName"] ?? "";
         houseRentController.text = item["rent"] ?? "";
@@ -48,8 +48,8 @@ class _HouseRentDetails extends State<HouseRentDetails>{
 
   }
 
-  final TextEditingController floorController = TextEditingController();
-  final TextEditingController unitController = TextEditingController();
+  // final TextEditingController floorController = TextEditingController();
+  // final TextEditingController unitController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController renterNameController = TextEditingController();
   final TextEditingController houseRentController = TextEditingController();
@@ -128,25 +128,38 @@ class _HouseRentDetails extends State<HouseRentDetails>{
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    floorController,
-                    "ফ্লোর নং*",
-                    TextInputType.number,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildUpperCaseTextField(
-                    unitController,
-                    "ইউনিট নং*",
-                    TextInputType.number,
-                  ),
-                ),
-              ],
+            Text(
+              "বাসা নং: ${buildingUnitList[widget.index]["holding_no"]??""}",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              overflow: TextOverflow.ellipsis,
             ),
+            const SizedBox(height: 12),
+            Text(
+              "ইউনিট: ${buildingUnitList[widget.index]["floor"]}-${buildingUnitList[widget.index]["unit"]}",
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+              ),
+            ),
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: _buildTextField(
+            //         floorController,
+            //         "ফ্লোর নং*",
+            //         TextInputType.number,
+            //       ),
+            //     ),
+            //     const SizedBox(width: 8),
+            //     Expanded(
+            //       child: _buildUpperCaseTextField(
+            //         unitController,
+            //         "ইউনিট নং*",
+            //         TextInputType.number,
+            //       ),
+            //     ),
+            //   ],
+            // ),
             const SizedBox(height: 12),
             _buildPhoneTextField(
               phoneNumberController,
@@ -252,27 +265,6 @@ class _HouseRentDetails extends State<HouseRentDetails>{
       controller: controller,
       readOnly: !isEditMode,
       keyboardType: type,
-      decoration: InputDecoration(
-        labelText:hint ,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 10,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildUpperCaseTextField(
-      TextEditingController controller,
-      String hint,
-      TextInputType type,
-      ) {
-    return TextField(
-      controller: controller,
-      keyboardType: type,
-      readOnly: !isEditMode,
-      inputFormatters: [UpperCaseTextFormatter()],
       decoration: InputDecoration(
         labelText:hint ,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
@@ -483,8 +475,8 @@ class _HouseRentDetails extends State<HouseRentDetails>{
   // ================================update========================
   void _onUpdate() async {
       final updateData={
-        "floor": floorController.text,
-        "unit": unitController.text,
+        // "floor": floorController.text,
+        // "unit": unitController.text,
         "phone": phoneNumberController.text,
         "renterName": renterNameController.text,
         "rent": houseRentController.text,

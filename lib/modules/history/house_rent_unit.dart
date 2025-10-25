@@ -100,14 +100,26 @@ class HouseRentUnitState extends State<HouseRentUnit> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      "ইউনিট: ${unit['floor']}-${unit['unit']}",
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+                    ),
+                    const SizedBox(height: 6),
                     Text("👤 ${unit['name'] ?? 'N/A'}",
                         style: const TextStyle(fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 2),
                     Text("📞 ${unit['phone'] ?? 'N/A'}"),
+                    const SizedBox(height: 2),
                     Text("💵 ভাড়া: ${unit['rent'] ?? 'N/A'}"),
+                    const SizedBox(height: 2),
                     Text("🔥 গ্যাস: ${unit['gas_bill'] ?? 'N/A'}"),
+                    const SizedBox(height: 2),
                     Text("💧 পানি: ${unit['water_bill'] ?? 'N/A'}"),
+                    const SizedBox(height: 2),
                     Text("⚡ বিদ্যুৎ: ${unit['current_bill'] ?? 'N/A'}"),
+                    const SizedBox(height: 2),
                     Text("💼 সার্ভিস: ${unit['charge'] ?? 'N/A'}"),
+                    const SizedBox(height: 2),
                     Text("🚗 গ্যারেজ: ${unit['garage_charge'] ?? 'N/A'}"),
                     const SizedBox(height: 8),
                     Align(
